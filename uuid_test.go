@@ -1,12 +1,19 @@
 package uuid
 
 import (
+	"log"
 	"testing"
 	"time"
 )
 
+func TestUUID(t *testing.T) {
+	InitializeStandalone()
+	x := Generate()
+	log.Printf("x is %d, %b\n", x, x)
+}
+
 func TestUUIDDistributed(t *testing.T) {
-	InitializeDistributedWithRedis("192.168.79.128:6379")
+	InitializeDistributedWithEtcd(1, []string{"192.168.79.128:6379"})
 	var lst int64
 	for i := 0; i < 10000; i++ {
 		x := Generate()
@@ -35,12 +42,12 @@ func TestUUIDStandalone(t *testing.T) {
 
 func TestUUIDQPS(t *testing.T) {
 	InitializeStandalone()
-	var amount int64 = 100000000
+	var amount int64 = 1000000
 	var i int64 = 0
 	st := time.Now()
 	for ; i < amount; i++ {
 		Generate()
 	}
 	used := time.Now().Sub(st)
-	t.Logf("Generate 100M UUIDs used time %v, QPS is %f\n", used, float64(amount)/used.Seconds())
+	t.Logf("Generate 1M UUIDs used time %v, QPS is %f\n", used, float64(amount)/used.Seconds())
 }
